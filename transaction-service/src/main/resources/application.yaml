@@ -25,6 +25,9 @@ spring:
   cloud:
     discovery:
       enabled: false
+    openfeign:
+      circuitbreaker:
+        enabled: true
 
 server:
   port: 8082
@@ -32,3 +35,6 @@ server:
 bank:
   transaction:
     max-amount: 1000
+
+account-service:
+  url: http://localhost:8081
