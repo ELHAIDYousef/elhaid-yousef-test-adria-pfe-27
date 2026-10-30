@@ -11,5 +11,6 @@
     <name>bank-platform</name>
 
     <modules>
+        <module>account-service</module>
     </modules>
 </project>
