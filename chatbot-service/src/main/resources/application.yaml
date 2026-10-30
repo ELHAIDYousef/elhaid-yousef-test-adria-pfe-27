@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: chatbot-service
+  config:
+    import:
+      - "optional:file:.env[.properties]"
+      - "optional:file:../.env[.properties]"
+  ai:
+    openai:
+      api-key: ${GROQ_API_KEY}
+      base-url: https://api.groq.com/openai/v1
+      chat:
+        model: qwen/qwen3.8-27b
+        extra-body:
+          reasoning_effort: none
+    mcp:
+      client:
+        streamable-http:
+          connections:
+            account:
+              url: http://localhost:8081/mcp
+            transaction:
+              url: http://localhost:8082/mcp
+
+server:
+  port: 8083
+
+eureka:
+  instance:
+    prefer-ip-address: true
