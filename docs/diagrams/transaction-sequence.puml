@@ -1,0 +1,48 @@
+@startuml transaction-sequence
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 12
+skinparam sequence {
+  ParticipantBorderColor #004C83
+  ParticipantBackgroundColor #E3EDF6
+  LifeLineBorderColor #004C83
+  ArrowColor #444444
+  GroupBorderColor #F75E1F
+  GroupHeaderFontColor #F75E1F
+}
+skinparam database {
+  BackgroundColor #FFFFFF
+  BorderColor #004C83
+}
+skinparam note {
+  BackgroundColor #FFFDF5
+  BorderColor #BBBBBB
+}
+
+actor Client
+participant "transaction-service" as TX
+participant "AccountRestClient\n(OpenFeign + Resilience4J)" as FEIGN
+participant "account-service" as ACC
+database "transaction-db" as DB
+
+Client -> TX : POST /api/transactions
+TX -> TX : montant > 0 et <= max-amount
+TX -> FEIGN : getAccountById(accountId)
+FEIGN -> ACC : GET /api/accounts/{id}
+ACC --> FEIGN : Account (status, currency, balance)
+FEIGN --> TX : Account
+TX -> TX : compte actif, même devise,\nsolde suffisant (DEBIT)
+TX -> DB : INSERT transaction
+TX -> FEIGN : debit(accountId, amount)
+FEIGN -> ACC : POST /api/accounts/{id}/debit
+ACC --> FEIGN : Account (nouveau solde)
+TX --> Client : 201 Created
+
+group account-service indisponible
+  FEIGN -> ACC : appel en échec / circuit ouvert
+  FEIGN -> FEIGN : fallback
+  FEIGN --> TX : AccountServiceUnavailableException
+  TX -> DB : rollback
+  TX --> Client : 503 Service Unavailable
+end
+@enduml
