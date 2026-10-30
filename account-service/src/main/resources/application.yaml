@@ -13,10 +13,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  cloud:
-    discovery:
-      enabled: false
-
+  graphql:
+    graphiql:
+      enabled: true
   ai:
     mcp:
       server:
@@ -24,11 +23,9 @@ spring:
         version: 1.0.0
         protocol: STREAMABLE
 
-
-  graphql:
-    graphiql:
-      enabled: true
-
 server:
   port: 8081
 
+eureka:
+  instance:
+    prefer-ip-address: true

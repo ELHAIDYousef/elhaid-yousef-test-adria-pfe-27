@@ -23,8 +23,6 @@ spring:
         version: 1.0.0
         protocol: STREAMABLE
   cloud:
-    discovery:
-      enabled: false
     openfeign:
       circuitbreaker:
         enabled: true
@@ -32,9 +30,10 @@ spring:
 server:
   port: 8082
 
+eureka:
+  instance:
+    prefer-ip-address: true
+
 bank:
   transaction:
     max-amount: 1000
-
-account-service:
-  url: http://localhost:8081

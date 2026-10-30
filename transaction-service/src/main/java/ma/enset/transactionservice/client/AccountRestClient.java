@@ -13,8 +13,7 @@ import java.util.UUID;
  *
  * @author Yousef ELHAID
  */
-@FeignClient(name = "account-service", url = "${account-service.url}",
-        fallbackFactory = AccountRestClientFallbackFactory.class)
+@FeignClient(name = "account-service", fallbackFactory = AccountRestClientFallbackFactory.class)
 public interface AccountRestClient {
 
     @GetMapping("/api/accounts/{id}")
