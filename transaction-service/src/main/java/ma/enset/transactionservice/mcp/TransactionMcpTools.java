@@ -55,4 +55,12 @@ public class TransactionMcpTools {
                 .build();
         return transactionService.createTransaction(transaction);
     }
+
+    @McpTool(name = "transfer", description = "Transfer money from one bank account to another account with the same currency")
+    public List<Transaction> transfer(
+            @McpToolParam(description = "Source account id (UUID)") String sourceAccountId,
+            @McpToolParam(description = "Target account id (UUID)") String targetAccountId,
+            @McpToolParam(description = "Amount to transfer, strictly positive") double amount) {
+        return transactionService.transfer(UUID.fromString(sourceAccountId), UUID.fromString(targetAccountId), BigDecimal.valueOf(amount));
+    }
 }

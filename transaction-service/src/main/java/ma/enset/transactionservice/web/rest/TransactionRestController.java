@@ -55,4 +55,10 @@ public class TransactionRestController {
                 .build();
         return transactionService.createTransaction(transaction);
     }
+
+    @PostMapping("/transfer")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<Transaction> transfer(@RequestBody @Valid TransferRequest request) {
+        return transactionService.transfer(request.sourceAccountId(), request.targetAccountId(), request.amount());
+    }
 }
