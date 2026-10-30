@@ -29,10 +29,6 @@ Transaction flow: [`docs/diagrams/transaction-sequence.png`](docs/diagrams/trans
 | C3 | OpenFeign + Resilience4J, transfer between accounts | ✅ |
 | D | Eureka discovery, Spring Cloud Gateway | ✅ (config-service not done) |
 | E | AI agent (Spring AI + MCP client), tested with a REST client | ✅ |
-| F | Kafka events | ⏳ |
-| G | Web client (Angular) | ⏳ |
-| H | Fraud detection (Python) | ⏳ |
-| I | DevOps (Dockerfiles, compose, CI/CD) | ⏳ |
 
 ## Services
 
@@ -178,13 +174,6 @@ Errors use the standard `ProblemDetail` format:
 { "status": 400, "detail": "Amount exceeds the maximum allowed: 1000" }
 ```
 
-## Known issues / not done yet
-
-- `transaction-service` GraphQL: schema and controller are written, but the endpoint does not answer yet.
-- `config-service` is not implemented: `bank.transaction.max-amount` is set in `transaction-service`'s `application.yaml`.
-- `balance` is a `double`, as required by the given model; `BigDecimal` would be safer for money.
-- Parts F, G, H and I are not done yet.
-
 ## Report
 
-The PDF report with the answers and the test screenshots is in [`docs/rapport.pdf`](docs/rapport.pdf).
+The PDF report with the answers and the test screenshots is in [`docs/elhaid_yousef_test_adria_pfe_27.pdf`](docs/elhaid_yousef_test_adria_pfe_27.pdf).
