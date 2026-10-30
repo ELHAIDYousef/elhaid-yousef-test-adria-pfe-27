@@ -1,0 +1,133 @@
+@startuml class-diagram
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 12
+skinparam nodesep 40
+skinparam ranksep 50
+skinparam class {
+  BackgroundColor #F6F8FA
+  BorderColor #004C83
+  ArrowColor #444444
+  StereotypeFontColor #F75E1F
+  HeaderBackgroundColor #E3EDF6
+}
+skinparam package {
+  BorderColor #004C83
+  FontColor #004C83
+  FontSize 14
+}
+hide empty members
+
+package "account-service" {
+  enum AccountStatus {
+    ACTIVE
+    BLOCKED
+  }
+
+  class Account <<Entity>> {
+    - id : UUID
+    - customerReference : String
+    - status : AccountStatus
+    - currency : String
+    - balance : double
+  }
+
+  interface AccountRepository <<JpaRepository>>
+
+  class AccountService <<Service>> {
+    + getAllAccounts() : List<Account>
+    + getAccountById(id : UUID) : Account
+    + createAccount(account : Account) : Account
+    + changeStatus(id : UUID, status : AccountStatus) : Account
+    + debit(id : UUID, amount : double) : Account
+    + credit(id : UUID, amount : double) : Account
+  }
+
+  class AccountRestController <<REST>>
+  class AccountGraphQLController <<GraphQL>>
+  class AccountMcpTools <<MCP>>
+
+  AccountRestController --> AccountService
+  AccountGraphQLController --> AccountService
+  AccountMcpTools --> AccountService
+  AccountService --> AccountRepository
+  AccountRepository ..> Account
+  Account --> AccountStatus
+}
+
+package "transaction-service" {
+  enum TransactionType {
+    DEBIT
+    CREDIT
+  }
+
+  class Transaction <<Entity>> {
+    - id : UUID
+    - accountId : UUID
+    - type : TransactionType
+    - amount : BigDecimal
+    - currency : String
+    - merchantCategory : String
+    - country : String
+    - createdAt : Instant
+  }
+
+  interface TransactionRepository <<JpaRepository>>
+
+  class TransactionService <<Service>> {
+    + createTransaction(transaction : Transaction) : Transaction
+    + transfer(sourceId : UUID, targetId : UUID, amount : BigDecimal) : List<Transaction>
+    + getAllTransactions() : List<Transaction>
+    + getTransactionById(id : UUID) : Transaction
+    + getTransactionsByAccount(accountId : UUID) : List<Transaction>
+  }
+
+  interface AccountRestClient <<OpenFeign>> {
+    + getAccountById(id : UUID) : Account
+    + debit(id : UUID, amount : double) : Account
+    + credit(id : UUID, amount : double) : Account
+  }
+
+  class "Account" as TxAccount <<model>> {
+    - id : UUID
+    - status : String
+    - currency : String
+    - balance : double
+  }
+
+  class TransactionCreatedEvent <<record>> {
+    eventId : UUID
+    eventType : String
+    transactionId : UUID
+    accountId : UUID
+    amount : BigDecimal
+    currency : String
+    occurredAt : Instant
+  }
+
+  class TransactionRestController <<REST>>
+  class TransactionGraphQLController <<GraphQL>>
+  class TransactionMcpTools <<MCP>>
+
+  TransactionRestController --> TransactionService
+  TransactionGraphQLController --> TransactionService
+  TransactionMcpTools --> TransactionService
+  TransactionService --> TransactionRepository
+  TransactionService --> AccountRestClient
+  TransactionService ..> TransactionCreatedEvent : publie (Kafka)
+  TransactionRepository ..> Transaction
+  Transaction --> TransactionType
+  AccountRestClient ..> TxAccount
+}
+
+package "audit-service" {
+  class TransactionEventConsumer <<KafkaListener>> {
+    + onTransactionCreated(event : TransactionCreatedEvent) : void
+  }
+}
+
+AccountRestClient ..> AccountRestController : HTTP + Resilience4J
+TransactionEventConsumer ..> TransactionCreatedEvent : consomme
+@enduml

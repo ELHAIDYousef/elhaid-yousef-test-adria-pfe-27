@@ -1,0 +1,90 @@
+@startuml architecture
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 13
+skinparam defaultTextAlignment center
+skinparam nodesep 45
+skinparam ranksep 60
+skinparam ArrowColor #444444
+skinparam ArrowFontSize 11
+skinparam ArrowFontColor #F75E1F
+skinparam rectangle {
+  BackgroundColor #F6F8FA
+  BorderColor #004C83
+}
+skinparam component {
+  BackgroundColor #E3EDF6
+  BorderColor #004C83
+}
+skinparam database {
+  BackgroundColor #FFFFFF
+  BorderColor #004C83
+}
+skinparam queue {
+  BackgroundColor #FDEDE6
+  BorderColor #F75E1F
+}
+skinparam cloud {
+  BackgroundColor #FFFFFF
+  BorderColor #888888
+}
+skinparam package {
+  BorderColor #004C83
+  FontColor #004C83
+}
+skinparam note {
+  BackgroundColor #FFFDF5
+  BorderColor #BBBBBB
+}
+
+rectangle "**Angular**\n:4200" as angular
+rectangle "**Client REST**\n(Postman)" as postman
+rectangle "**Telegram**" as telegram
+
+component "**gateway-service**\nSpring Cloud Gateway\n:8888" as gw
+
+package "Micro-services métier" {
+  component "**account-service**\n:8081\nREST · GraphQL · MCP" as acc
+  component "**transaction-service**\n:8082\nREST · GraphQL · MCP" as tx
+}
+
+component "**chatbot-service**\nSpring AI (client MCP)\n:8083" as bot
+cloud "**LLM**" as llm
+
+database "**account-db**\nPostgreSQL" as accdb
+database "**transaction-db**\nPostgreSQL" as txdb
+
+queue "**Kafka** :9092\nbank.transactions.created" as kafka
+component "**audit-service**\nconsumer\n:8084" as audit
+
+package "Services techniques" {
+  component "**discovery-service**\nEureka\n:8761" as eureka
+  component "**config-service**\nConfig Server\n:9999\n<size:11><i>bank.transaction.max-amount=1000</i></size>" as config
+}
+
+angular --> gw
+postman --> gw
+gw --> acc
+gw --> tx
+gw --> bot
+telegram <--> bot
+
+tx -left-> acc : OpenFeign\n+ Resilience4J
+bot --> acc : MCP
+bot --> tx : MCP
+bot -right-> llm
+
+acc --> accdb
+tx --> txdb
+tx --> kafka : publie
+kafka --> audit : consomme
+
+gw ..> eureka : découverte
+config <.. tx : configuration
+
+note bottom of eureka
+  Tous les micro-services s'enregistrent
+  dans Eureka et lisent leur configuration
+  depuis config-service.
+end note
+@enduml
