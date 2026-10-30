@@ -1,0 +1,34 @@
+# ===== Maven / Java =====
+target/
+*.class
+*.log
+HELP.md
+
+# ===== IntelliJ / editors =====
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.vscode/
+
+# ===== Secrets =====
+.env
+*.p12
+*.jks
+
+# ===== Node / Angular =====
+node_modules/
+dist/
+.angular/
+
+# ===== Python =====
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
