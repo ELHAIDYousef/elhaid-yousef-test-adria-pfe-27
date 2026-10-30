@@ -17,5 +17,10 @@ spring:
     discovery:
       enabled: false
 
+  graphql:
+    graphiql:
+      enabled: true
+
 server:
   port: 8081
+
