@@ -1,0 +1,34 @@
+type Query {
+    transactions: [Transaction]
+    transactionById(id: ID!): Transaction
+    transactionsByAccount(accountId: ID!): [Transaction]
+}
+
+type Mutation {
+    createTransaction(transaction: TransactionInput!): Transaction
+}
+
+type Transaction {
+    id: ID
+    accountId: ID
+    type: TransactionType
+    amount: Float
+    currency: String
+    merchantCategory: String
+    country: String
+    createdAt: String
+}
+
+enum TransactionType {
+    DEBIT
+    CREDIT
+}
+
+input TransactionInput {
+    accountId: ID!
+    type: TransactionType
+    amount: Float!
+    currency: String!
+    merchantCategory: String!
+    country: String!
+}
