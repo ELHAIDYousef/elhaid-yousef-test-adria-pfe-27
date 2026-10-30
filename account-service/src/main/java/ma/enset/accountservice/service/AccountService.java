@@ -33,6 +33,9 @@ public class AccountService {
     }
 
     public Account createAccount(Account account) {
+        if (account.getBalance() < 0) {
+            throw new BusinessRuleException("Initial balance must be zero or positive");
+        }
         account.setId(null);
         account.setCurrency(account.getCurrency().toUpperCase());
         if (account.getStatus() == null) {

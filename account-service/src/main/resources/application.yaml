@@ -17,6 +17,14 @@ spring:
     discovery:
       enabled: false
 
+  ai:
+    mcp:
+      server:
+        name: account-mcp-server
+        version: 1.0.0
+        protocol: STREAMABLE
+
+
   graphql:
     graphiql:
       enabled: true
