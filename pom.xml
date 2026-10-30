@@ -14,5 +14,6 @@
         <module>account-service</module>
         <module>transaction-service</module>
         <module>discovery-service</module>
+        <module>gateway-service</module>
     </modules>
 </project>
